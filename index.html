@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="title">防伪查询</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta8PUbWsyM4Q2sabFhWNoYJvQfguL6wYyLwJb4Hprx4L6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* ==================================================================== */
+        /* 全局/基础样式 - 适用于所有屏幕尺寸的默认设置 */
+        /* ==================================================================== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* 新的背景图地址 */
+            background: url('https://i.imgur.com/Nm61N3d.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            display: flex; /* Enable Flexbox for centering */
+            justify-content: center; /* Center horizontally along main axis */
+            align-items: flex-start; /* 将内容对齐到顶部，而不是垂直居中整个 body */
+            min-height: 100vh; /* 确保 body 至少占满视口高度 */
+            overflow-y: auto; /* 允许垂直滚动，以防内容溢出 */
+            position: relative; /* 用于定位语言切换器 */
+            padding-top: 50px; /* 为顶部语言选择器留出空间 */
+            padding-bottom: 20px; /* 底部留白 */
+            box-sizing: border-box; /* 确保 padding 不会增加总高度 */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* 容器最大宽度 */
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 语言切换下拉菜单样式 */
+        .language-switcher {
+            position: absolute;
+            top: 15px; /* 距离顶部稍近 */
+            left: 20px; /* 移动到左上角 */
+            z-index: 10; /* 确保在其他内容之上 */
+        }
+
+        .language-switcher select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            color: #333;
+            appearance: none; /* 移除默认下拉箭头 */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.1%208.1-3.9%204.9-4.8%2011.8-2.5%2017.9l139%20202.6c3.1%204.6%208%207.1%2013%207.1s9.9-2.4%2013-7.1L289.5%2090.3c2.3-6.1%201.4-13-2.5-17.9z%22%2F%3E%3C%2Fsvg%3E'); /* 自定义下拉箭头 */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+            padding-right: 30px; /* 为自定义箭头留出空间 */
+        }
+
+        /* 主要内容框（防伪查询部分）基础样式 */
+        .content .box {
+            width: 65%; /* 恢复到接近最初的桌面宽度 */
+            max-width: 550px; /* 桌面端最大宽度 */
+            min-width: 300px; /* 确保最小宽度 */
+            min-height: auto;
+            background-color: rgba(242, 242, 242, 0.85); /* 半透明浅灰色背景 */
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* 阴影 */
+            display: flex;
+            flex-direction: column; /* 垂直排列子元素 */
+            align-items: center; /* 子元素水平居中 */
+            text-align: center; /* 文本居中 */
+            box-sizing: border-box; /* 边框盒模型 */
+            padding: 60px 10px 15px 10px; /* 恢复最初的内边距 */
+            margin: 0 auto; /* 水平居中 */
+        }
+
+        /* Input field styling */
+        input {
+            background: transparent;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 18px;
+            color: #333;
+            width: calc(80% - 22px); /* 恢复最初的宽度计算 */
+            max-width: 400px; /* Increased max-width to fit larger box */
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* Specific style for readonly input fields */
+        input[readonly] {
+            background-color: rgba(220, 220, 220, 0.5);
+            cursor: default;
+        }
+
+        /* Verification Button Styling */
+        .verify-button {
+            background-color: #DC3545; /* Red color */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            width: calc(80% - 22px); /* 恢复最初的宽度计算 */
+            max-width: 400px; /* Increased max-width to fit larger box */
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .verify-button:hover {
+            background-color: #C82333;
+            transform: translateY(-1px);
+        }
+
+        .verify-button:active {
+            background-color: #BD2130;
+            transform: translateY(0);
+        }
+
+        /* Genuine Status Section */
+        .genuine-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: #28a745; /* Green color for "泡泡玛特正品" */
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .genuine-status .icon-shield {
+            font-size: 2em;
+            margin-right: 8px;
+        }
+        .genuine-status .fa-solid {
+            color: #28a745; /* Green color for the shield icon itself */
+        }
+
+               /* 样式部分 */
+        .image-aspect-ratio-container {
+            width: 50px; /* 容器宽度 */
+            height: 50px; /* 容器高度 */
+            overflow: hidden; /* 隐藏超出部分 */
+            position: relative; /* 相对定位 */
+        }
+        .image-aspect-ratio-container img {
+            width: 100%; /* 图片宽度 */
+            height: 100%; /* 图片高度 */
+            object-fit: cover; /* 使图片铺满容器 */
+        }
+
+
+        /* Main text paragraphs */
+        p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Styles for the anti-fake code display */
+        .anti-fake-display {
+            margin-bottom: 0px; /* Reduced margin to bring lines closer */
+            line-height: 1.2; /* Tighter line height for closer lines */
+        }
+        .displayed-code-number {
+            color: #000; /* Black color for the number */
+            font-weight: bold;
+            display: block; /* Ensures it starts on a new line */
+            margin-top: 5px; /* Adds a small space above the number if needed */
+        }
+
+        /* New style for red text */
+        .red-text {
+            color: #DC3545; /* Red color, same as button */
+            font-weight: bold;
+        }
+
+        /* System Time Display */
+        .system-time {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        /* Section for additional instructions */
+        .instructions-section {
+            margin-top: 30px;
+            text-align: left;
+            max-width: 90%; /* Allow instructions to take more width within the wider box */
+            padding-top: 20px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .instructions-section p {
+            margin-bottom: 8px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px; /* 为移动端语言选择器留更多空间 */
+            }
+            .content .box {
+                width: 95%; /* 移动端宽度稍大 */
+                padding: 40px 10px 10px 10px; /* 移动端内边距 */
+            }
+            input, .verify-button {
+                width: calc(90% - 22px); /* 移动端宽度 */
+            }
+            .genuine-status {
+                font-size: 1em;
+            }
+            .genuine-status .icon-shield {
+                font-size: 1.8em;
+            }
+            .system-time {
+                font-size: 0.85em;
+            }
+            .instructions-section {
+                max-width: 95%;
+            }
+            /* 由于图片不优化，在移动端可能会非常大，用户需要滚动 */
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <select id="languageSelect">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="box">
+                <h2 data-lang-key="title">防伪查询</h2>
+                <div style="text-align: center;">
+                    <input type="text" id="securityCodeInput" readonly>
+                    
+                    <button class="verify-button" id="verifyButton" data-lang-key="verifyButton">验证</button>
+
+                   
+
+                    <div class="genuine-status">
+                         <div class="image-aspect-ratio-container">
+                            <img src="https://i.imgur.com/yQWntee.png" alt="Advertisement Image">
+                        </div>
+
+
+                    </div>
+                    <div class="genuine-status">
+                        <span class="icon-shield"><i class="fa-solid fa-shield-check"></i></span>
+                        <span data-lang-key="genuineStatus">泡泡玛特正品</span>
+                    </div>
+                    <span class="anti-fake-display" data-lang-key="securityCodePrefix">您好!您查询的防伪码</span>
+                    <span class="anti-fake-display"><span id="securityCodeDisplay" class="displayed-code-number"></span><span data-lang-key="securityCodeSuffix">是真品</span></span>
+                    
+                    <p data-lang-key="queryCountTextPrefix">当前为第<span id="queryCount" class="red-text">1</span>次查询</p>
+                    <p class="system-time" data-lang-key="queryTimeTextPrefix">查询时间: <span id="currentTime" class="red-text"></span></p>
+                </div>
+                
+                <div class="instructions-section">
+                    <p style="font-weight: bold;" data-lang-key="instructionsTitle">泡泡玛特防伪验证入口</p>
+                    <span data-lang-key="instruction1">1、中国大陆:官方微信小程序《泡泡玛特服务中心》，扫描包装盒的防伪码即可打开。</span></p>
+                    <span data-lang-key="instruction2">2、港澳台及海外:官方域名为m-gss.popmart.com的Customer Service页，扫描包装盒的防伪码即可打开。</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Anti-fake code prefix and random part length
+        const prefix = "4896316630414"; 
+        const randomLength = 4; 
+
+        // Get references to HTML elements
+        const securityCodeInput = document.getElementById('securityCodeInput');
+        const securityCodeDisplay = document.getElementById('securityCodeDisplay');
+        const queryCountElement = document.getElementById('queryCount');
+        const verifyButton = document.getElementById('verifyButton');
+        const currentTimeElement = document.getElementById('currentTime');
+        const languageSelect = document.getElementById('languageSelect');
+
+        // Language text data
+        const translations = {
+            zh: {
+                title: "防伪查询",
+                verifyButton: "验证",
+                genuineStatus: "泡泡玛特正品",
+                securityCodePrefix: "您好!您查询的防伪码",
+                securityCodeSuffix: "是真品",
+                queryCountTextPrefix: "当前为第<span id='queryCount' class='red-text'>1</span>次查询",
+                queryTimeTextPrefix: "查询时间: <span id='currentTime' class='red-text'></span>",
+                instructionsTitle: "泡泡玛特防伪验证入口",
+                instruction1: "1、中国大陆:官方微信小程序《泡泡玛特服务中心》，扫描包装盒的防伪码即可打开。",
+                instruction2: "2、港澳台及海外:官方域名为m-gss.popmart.com的Customer Service页，扫描包装盒的防伪码即可打开。",
+                alertMessage: (code, count) => `正在验证防伪码: ${code}\n查询次数: ${count}\n（此为前端模拟，实际需后端验证）`
+            },
+            en: {
+                title: "Anti-Counterfeiting Query",
+                verifyButton: "Verify",
+                genuineStatus: "POP MART Genuine Product",
+                securityCodePrefix: "Hello! The anti-counterfeiting code you queried",
+                securityCodeSuffix: "is genuine",
+                queryCountTextPrefix: "Current query: <span id='queryCount' class='red-text'>1</span> time(s)",
+                queryTimeTextPrefix: "Query Time: <span id='currentTime' class='red-text'></span>",
+                instructionsTitle: "POP MART Anti-Counterfeiting Verification Entrance",
+                instruction1: "1. Mainland China: Scan the anti-counterfeiting code on the packaging box using the official WeChat mini-program \"POP MART Service Center\" to open.",
+                instruction2: "2. Hong Kong, Macao, Taiwan & Overseas: Scan the anti-counterfeiting code on the packaging box to open the Customer Service page on the official domain m-gss.popmart.com.",
+                alertMessage: (code, count) => `Verifying anti-counterfeiting code: ${code}\nQuery count: ${count}\n(This is a front-end simulation, actual verification requires backend)`
+            }
+        };
+
+        let currentLanguage = 'en'; // 默认语言为中文
+
+        /**
+         * Generates a random suffix for the anti-fake code.
+         * @param {number} length - The desired length of the random suffix.
+         * @returns {string} The random numeric suffix.
+         */
+        function generateRandomSuffix(length) {
+            let result = '';
+            const characters = '0123456789';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        /**
+         * Formats a Date object into a readable string (e.g.,YYYY-MM-DD HH:mm:ss).
+         * @param {Date} date - The Date object to format.
+         * @returns {string} The formatted date string.
+         */
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        /**
+         * Updates all translatable text content on the page based on the current language.
+         */
+        function updateContentLanguage() {
+            const langData = translations[currentLanguage];
+
+            // Update title (in head)
+            document.head.querySelector('[data-lang-key="title"]').textContent = langData.title;
+
+            // Update h2 title (in body)
+            document.querySelector('.box h2[data-lang-key="title"]').textContent = langData.title;
+
+            // Update verify button
+            verifyButton.textContent = langData.verifyButton;
+
+            // Update genuine status
+            document.querySelector('[data-lang-key="genuineStatus"]').textContent = langData.genuineStatus;
+
+            // Update security code info (split into prefix and suffix)
+            document.querySelector('[data-lang-key="securityCodePrefix"]').textContent = langData.securityCodePrefix;
+            document.querySelector('[data-lang-key="securityCodeSuffix"]').textContent = langData.securityCodeSuffix;
+            
+            // Update query count text
+            const queryCountTextP = document.querySelector('[data-lang-key="queryCountTextPrefix"]');
+            // Reconstruct innerHTML to correctly place the existing queryCountElement span
+            queryCountTextP.innerHTML = langData.queryCountTextPrefix.replace(/<span id='queryCount' class='red-text'>.*?<\/span>/, `<span id='queryCount' class='red-text'>${queryCountElement.textContent}</span>`);
+
+            // Update query time text
+            const queryTimeTextP = document.querySelector('[data-lang-key="queryTimeTextPrefix"]');
+            // Reconstruct innerHTML to correctly place the existing currentTimeElement span
+            queryTimeTextP.innerHTML = langData.queryTimeTextPrefix.replace(/<span id='currentTime' class='red-text'>.*?<\/span>/, `<span id='currentTime' class='red-text'>${currentTimeElement.textContent}</span>`);
+            
+            // Update instructions
+            document.querySelector('[data-lang-key="instructionsTitle"]').textContent = langData.instructionsTitle;
+            document.querySelector('[data-lang-key="instruction1"]').textContent = langData.instruction1;
+            document.querySelector('[data-lang-key="instruction2"]').textContent = langData.instruction2;
+
+            // Ensure the dropdown reflects the current language
+            languageSelect.value = currentLanguage;
+        }
+
+        /**
+         * Initializes the anti-fake code display and current time on page load.
+         * This function is called once on page load to keep the code fixed.
+         */
+        function initializeAntiFakeCodeDisplay() {
+            const initialAntiFakeCode = prefix + generateRandomSuffix(randomLength);
+            securityCodeInput.value = initialAntiFakeCode;
+            securityCodeDisplay.textContent = initialAntiFakeCode;
+            queryCountElement.textContent = '1';
+            currentTimeElement.textContent = formatDateTime(new Date());
+            console.log("Initial Anti-Fake Code displayed:", initialAntiFakeCode);
+        }
+
+        // Run this when the entire HTML document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display the initial anti-fake code and current time when the page loads
+            initializeAntiFakeCodeDisplay();
+            // Update all text content based on the default language
+            updateContentLanguage();
+
+            // Language select change event listener
+            languageSelect.addEventListener('change', function() {
+                currentLanguage = this.value; // Get the selected language
+                updateContentLanguage(); // Update all text content
+            });
+
+            // When the button is clicked, it updates the query count and time.
+            verifyButton.addEventListener('click', function() {
+                const codeToVerify = securityCodeInput.value;
+
+                let currentCount = parseInt(queryCountElement.textContent);
+                currentCount = isNaN(currentCount) ? 1 : currentCount + 1;
+                queryCountElement.textContent = currentCount;
+
+                currentTimeElement.textContent = formatDateTime(new Date());
+
+                // Update text content after changing numbers/time
+                updateContentLanguage();
+
+                // Show alert in the current language
+                alert(translations[currentLanguage].alertMessage(codeToVerify, currentCount));
+            });
+        });
+    </script>
+</body>
+</html>
