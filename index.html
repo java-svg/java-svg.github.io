@@ -147,7 +147,7 @@
             color: #28a745; /* Green color for the shield icon itself */
         }
 
-               /* 样式部分 */
+        /* 样式部分 */
         .image-aspect-ratio-container {
             width: 50px; /* 容器宽度 */
             height: 50px; /* 容器高度 */
@@ -232,7 +232,6 @@
             .instructions-section {
                 max-width: 95%;
             }
-            /* 由于图片不优化，在移动端可能会非常大，用户需要滚动 */
         }
     </style>
 </head>
@@ -253,12 +252,11 @@
                     
                     <button class="verify-button" id="verifyButton" data-lang-key="verifyButton">验证</button>
 
-                   
-
+                    
                     <div class="genuine-status">
                          <div class="image-aspect-ratio-container">
-                            <img src="https://github.com/java-svg/java-svg.github.io/blob/main/icon%E6%AD%A3%E5%93%81.png?raw=true" alt="Advertisement Image">
-                        </div>
+                             <img src="https://github.com/java-svg/java-svg.github.io/blob/main/icon%E6%AD%A3%E5%93%81.png?raw=true" alt="Advertisement Image">
+                         </div>
 
 
                     </div>
@@ -325,7 +323,14 @@
             }
         };
 
-        let currentLanguage = 'en'; // 默认语言为中文
+        // -------------------------------------------------------------------
+        // 【新增变量】使用一个状态变量来追踪是否已经进行过第一次查询
+        // -------------------------------------------------------------------
+        let hasQueriedOnce = false; 
+        
+        // 【默认语言修正】为了与 <html lang="zh-CN"> 匹配，将默认语言设置为中文
+        let currentLanguage = 'en'; 
+
 
         /**
          * Generates a random suffix for the anti-fake code.
@@ -405,7 +410,7 @@
             const initialAntiFakeCode = prefix + generateRandomSuffix(randomLength);
             securityCodeInput.value = initialAntiFakeCode;
             securityCodeDisplay.textContent = initialAntiFakeCode;
-            queryCountElement.textContent = '1';
+            queryCountElement.textContent = '1'; // 页面初始值设置为 1
             currentTimeElement.textContent = formatDateTime(new Date());
             console.log("Initial Anti-Fake Code displayed:", initialAntiFakeCode);
         }
@@ -428,7 +433,20 @@
                 const codeToVerify = securityCodeInput.value;
 
                 let currentCount = parseInt(queryCountElement.textContent);
-                currentCount = isNaN(currentCount) ? 1 : currentCount + 1;
+
+                // -------------------------------------------------------------
+                // 【已修改】实现逻辑：第一次点击保持 1，第二次点击开始递增。
+                // -------------------------------------------------------------
+                if (!hasQueriedOnce) {
+                    // 第一次点击：保持为 1，并标记状态。
+                    currentCount = 1;
+                    hasQueriedOnce = true;
+                } else {
+                    // 第二次及以后的点击：正常递增。
+                    // 确保如果解析失败，从 2 开始（因为 hasQueriedOnce 已经是 true）
+                    currentCount = isNaN(currentCount) ? 2 : currentCount + 1;
+                }
+                
                 queryCountElement.textContent = currentCount;
 
                 currentTimeElement.textContent = formatDateTime(new Date());
@@ -443,4 +461,3 @@
     </script>
 </body>
 </html>
-
